@@ -1,0 +1,68 @@
+**Input:**
+
+**Scope:** *None*
+
+**Git Log:** *None*
+
+**Diff:**
+```diff
+some diff
+```
+
+
+-------------------------------------------------
+-------- NEXT STEPS AND WORK IN PROGRESS --------
+-------------------------------------------------
+
+
+**WIP Context:** *None*
+---
+**Input:**
+
+**Scope:** `api`
+
+**Git Log:** *None*
+
+**Diff:**
+```diff
+some diff
+```
+
+
+-------------------------------------------------
+-------- NEXT STEPS AND WORK IN PROGRESS --------
+-------------------------------------------------
+
+
+**WIP Context:** *None*
+---
+**Input:**
+
+**Scope:** `api`
+
+**Git Log:**
+```
+some log
+
+and other logs
+```
+
+**Diff:**
+```diff
+some diff
+```
+
+
+-------------------------------------------------
+-------- NEXT STEPS AND WORK IN PROGRESS --------
+-------------------------------------------------
+
+
+**WIP Context:**
+
+*Other:*
+- Wonderful
+- Things
+
+*Known Issues:*
+- We acknowledge that it is unfortunate

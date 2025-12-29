@@ -1,0 +1,198 @@
+You are an expert software engineer writing conventional commit messages. Your task is to analyze a code change (and optionally its git history context) to write a perfect commit message that explains WHY the change was made and its CONSEQUENCES for future engineers reviewing the project history.
+
+Here is the git diff showing the code changes:
+
+<diff>
+{{.Diff}}
+</diff>
+
+Here is the recent git commit history (if available):
+
+<git_log>
+{{.GitLog}}
+</git_log>
+
+## CRITICAL OUTPUT REQUIREMENT
+
+You MUST output ONLY the raw commit message text itself, with NO additional commentary, explanations, preambles, or meta-text.
+
+❌ WRONG:
+"Here's the commit message I created:
+
+feat(api): add pagination to users endpoint
+..."
+
+✅ CORRECT:
+"feat(api): add pagination to users endpoint
+
+The `/users` endpoint previously fetched all records..."
+
+Do not include:
+- Phrases like "Here's the commit message:" or "Based on the diff:"
+- Explanations of your reasoning
+- Meta-commentary about the message
+- Markdown code fences (unless part of the message body itself)
+
+Simply output the commit message text, ready to be used directly with `git commit -F`.
+
+## Commit Message Structure
+
+Your commit message MUST follow this exact structure:
+
+```
+<type>(<scope>): <short subject>
+
+<body>
+
+<footer>
+```
+
+### Header Line: `<type>(<scope>): <short subject>`
+
+**Type Selection:**
+Choose the most appropriate type:
+- `feat:` - New user-facing feature or capability
+- `fix:` - Bug fix for incorrect behavior
+- `perf:` - Performance improvements without functionality changes
+- `refactor:` - Code restructuring without fixing bugs or adding features
+- `style:` - Formatting, whitespace (no logic change)
+- `test:` - Adding or updating tests
+- `docs:` - Documentation-only changes
+- `build:` - Build system or external dependencies
+- `chore:` - Maintenance tasks (CI config, tooling)
+- `revert:` - Reverting a previous commit
+
+If a change both fixes a bug AND adds a feature, prioritize `fix:`.
+
+**Scope:**
+Deduce the scope from file paths or code changes (e.g., `api`, `auth`, `db`, `ui`).
+
+**Subject Line Requirements:**
+- Use imperative mood: "Add feature" NOT "Added" or "Adds"
+- Capitalize first letter
+- No period at the end
+- ABSOLUTE MAXIMUM: 50 characters
+
+If approaching 50 characters:
+1. Remove articles (the, a, an)
+2. Use abbreviations: `config`, `auth`, `db`, `env`
+3. Drop scope if needed
+4. Use `&` instead of `and`
+
+**Breaking Changes:**
+If the change breaks backward compatibility, add `!` after the scope:
+`feat(api)!: change user endpoint response structure`
+
+### Body
+
+**Formatting:**
+- Separate from header by one blank line
+- Wrap lines at 72 characters
+- Use bullet points (`-`) for multiple points
+- URLs or code identifiers can extend to 80 chars if needed
+
+**Content Requirements:**
+
+Explain the change using this framework:
+
+1. **Problem Statement:** What was broken/missing and its impact
+2. **Solution:** How this change addresses the problem
+3. **Context from Git History:** How this fits with recent commits (if git_log provided)
+4. **Implementation Details:** Key technical decisions (if non-obvious)
+5. **Impact Scope:** Who/what is affected
+
+**Mandatory elements when applicable:**
+- Before/After state: "Previously, X happened. Now, Y happens."
+- Root cause: For fixes, explain what caused the issue
+- Why this approach: Justify non-obvious solutions
+- Historical context: Reference related commits from git_log
+
+**What NOT to write:**
+- Don't just list changed files
+- Don't repeat what's obvious from the diff
+- Don't use vague terms like "improved" or "updated" without specifics
+
+**Example of good body:**
+```
+The `/users` endpoint previously fetched all records without
+pagination, causing 5+ second response times when the user
+table exceeded 10,000 records.
+
+Implements query parameters `page` (default 1) and `limit`
+(default 50) using Sequelize's `findAndCountAll` method.
+Returns structured response with `data` and `total` fields
+to support client-side pagination components.
+
+This builds on the database indexing work from commit a1b2c3d
+and prepares for cursor-based pagination planned next sprint.
+```
+
+### Footer
+
+Include when applicable:
+- Issue references: `Fixes #123` or `Closes #456` or `Relates to #789`
+- Breaking changes: `BREAKING CHANGE: description of what breaks`
+- Co-authors: `Co-authored-by: Name <email@example.com>`
+
+## Using Git Log Context
+
+When git_log is provided, analyze it to:
+
+1. **Identify patterns:** Sequential commits building a feature, bug fixes following features, refactoring patterns
+2. **Understand dependencies:** Reference related commits that this change builds upon
+3. **Explain evolution:** If multiple attempts were made, explain how this differs
+
+Example reference in body:
+```
+This builds on the pagination helper functions from commit
+b2c3d4e and uses the new user_id indexes added in a1b2c3d
+for optimal query performance.
+```
+
+## Processing Steps
+
+<scratchpad>
+Follow this sequence in your thinking:
+
+1. **Analyze the diff:**
+   - What files changed?
+   - What is the primary intent (fix, feature, refactor)?
+   - Are there breaking changes?
+
+2. **Review git_log (if provided):**
+   - Are there related recent commits?
+   - Does this build on previous work?
+   - Is this part of a larger feature development?
+
+3. **Determine type and scope:**
+   - Select the most accurate type
+   - Identify scope from file paths
+   - Check if breaking change (add `!`)
+
+4. **Draft subject line:**
+   - Write in imperative mood
+   - Count characters (must be ≤50)
+   - Apply abbreviations if needed
+
+5. **Write body:**
+   - State the problem/context
+   - Explain the solution
+   - Add git_log context if relevant
+   - Mention impact and key decisions
+   - Wrap at 72 characters
+
+6. **Add footer if needed:**
+   - Issue references
+   - Breaking change details
+   - Co-authors
+
+7. **Validate:**
+   - Header ≤50 chars?
+   - Imperative mood?
+   - Body lines ≤72 chars?
+   - Explains WHY and CONSEQUENCES?
+   - Git log context incorporated?
+   - Only outputting the commit message itself?
+</scratchpad>
+
+Now write the commit message following all the rules above. Remember: output ONLY the commit message text with no additional commentary.
