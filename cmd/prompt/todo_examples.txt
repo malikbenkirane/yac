@@ -1,0 +1,116 @@
+
+3. **`wip_context`** (optional): Work-in-progress notes, including:
+   - Known issues or limitations in the current implementation
+   - Planned improvements or refinements for future commits
+   - Error messages encountered during development
+   - Ideas for optimization or refactoring
+   - Temporary workarounds that need proper solutions
+
+### **3. Footer (Optional)**
+
+Include a footer when relevant:
+
+#### **Issue References:**
+- `Fixes #123` - Use when PR/commit closes the issue
+- `Closes #123, #456` - For multiple issues
+- `Refs #123` - Related but doesn't close the issue
+- `Part of #123` - Partial work on a larger issue
+- `WIP for #123` - Work in progress toward resolving the issue
+
+#### **Breaking Changes:**
+If the change breaks backward compatibility, you **MUST**:
+1. Add `!` before the colon in header: `feat(api)!: change auth endpoint`
+2. Include footer section:
+```
+BREAKING CHANGE: The `/users` endpoint now requires authentication.
+All clients must include `Authorization: Bearer <token>` header.
+Migration guide: https://docs.example.com/migration-v2
+```
+
+**Breaking Change Detection Heuristics:**
+- Function/method signature changes (parameters added/removed/reordered)
+- Removal of public methods, classes, or endpoints
+- Changed default values affecting behavior
+- Database migrations requiring manual intervention
+- Configuration format changes
+
+#### **WIP Indicators in Footer:**
+When wip_context suggests significant incomplete work:
+```
+Known Issues:
+- Authentication timeout still occurs under high load
+- Edge case with empty user list needs handling
+- Performance optimization pending for large datasets
+
+Next Steps:
+- Add comprehensive error handling
+- Implement rate limiting
+- Add integration tests for pagination edge cases
+```
+
+#### **Other Footer Types:**
+```
+Deprecates: `getUserById()` in favor of `users.findById()`
+Removal planned for: v3.0.0
+
+Co-authored-by: Jane Doe <jane@example.com>
+
+Reviewed-by: John Smith <john@example.com>
+```
+
+
+## **Using WIP Context**
+
+When `wip_context` is provided, integrate it strategically:
+
+### **1. Document Known Issues Transparently**
+If wip_context mentions: "Error: timeout on large datasets, need to implement streaming"
+
+Include in body:
+```
+Known limitation: Queries timeout for datasets >50k records.
+Streaming implementation planned for next commit to handle
+large result sets incrementally.
+```
+
+### **2. Acknowledge Temporary Solutions**
+If wip_context notes: "Using setTimeout as temp fix, needs proper async handling"
+
+Include in body:
+```
+Note: Currently uses setTimeout for async operation sequencing.
+This is a temporary workaround; proper Promise-based flow
+control will be implemented once the race condition in the
+event emitter is resolved.
+```
+
+### **3. Document Future Improvements**
+If wip_context lists improvements:
+```
+Future enhancements planned:
+- Add Redis caching layer for frequently accessed pages
+- Implement cursor-based pagination for better performance
+- Add comprehensive input validation
+```
+
+### **4. Reference Error Messages**
+If wip_context includes error messages:
+```
+Resolves the "Maximum call stack exceeded" error that occurred
+when processing deeply nested user hierarchies. Previous
+recursive approach replaced with iterative algorithm using
+explicit stack.
+```
+
+### **5. Decide on `wip:` Type**
+Use `wip:` type prefix ONLY when:
+- The implementation is fundamentally incomplete
+- Critical functionality is missing
+- The commit is a checkpoint in a larger, unfinished feature
+
+**Don't use `wip:` for:**
+- Minor known issues or edge cases
+- Planned future enhancements
+- Technical debt that doesn't block functionality
+
+---

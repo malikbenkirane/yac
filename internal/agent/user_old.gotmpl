@@ -1,0 +1,27 @@
+**Input:**
+
+**Scope:** {{ if len .Scope }}`{{ .Scope }}`{{ else }}*None*{{ end }}
+
+**Git Log:**{{ if len .GitLog }}
+```
+{{.GitLog}}
+```
+{{- else }} *None*
+{{- end }}
+
+**Diff:**
+```diff
+{{.Diff}}
+```
+
+{{ .IdealSeparator }}
+
+**WIP Context:**{{ if eq (len .IdealFuture) 0 }} *None*{{ else }}
+{{ range $, $section := .IdealFuture }}
+*{{ $section.Name }}:*
+{{- range $, $note := $section.Notes }}
+- {{ $note }}
+{{- end}}
+{{ end}}
+{{- end -}}
+
