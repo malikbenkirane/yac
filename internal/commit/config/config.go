@@ -6,14 +6,12 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/malikbenkirane/yac/internal/commit/scope"
 	"github.com/malikbenkirane/yac/internal/commit/wip"
 )
 
 type Flags interface {
 	FlagsLogs() []string
 	FlagsWip() map[wip.Context][]string
-	FlagScope() scope.Scope
 }
 
 var _ Flags = &configJSON{}
@@ -31,10 +29,8 @@ const (
 type Config = *config
 
 type config struct {
-	Wip   map[wip.Context][]string
-	Logs  []string
-	Scope string
-	scope scope.Scope
+	Wip  map[wip.Context][]string
+	Logs []string
 }
 
 var _ yaml.Unmarshaler = &config{}
@@ -47,20 +43,9 @@ func (f *config) UnmarshalYAML(n *yaml.Node) error {
 	if err := n.Decode(&v); err != nil {
 		return fmt.Errorf("unmarshal flag json: %w", err)
 	}
-	_scope := scope.Scope(-1)
-	for i := scope.Other; i < scope.UpperBound; i++ {
-		if i.String() == v.Scope {
-			_scope = i
-		}
-	}
-	if _scope == -1 {
-		_scope = scope.Other
-	}
 	*f = config{
-		Wip:   v.Wip.M,
-		Logs:  v.Logs,
-		Scope: _scope.String(),
-		scope: _scope,
+		Wip:  v.Wip.M,
+		Logs: v.Logs,
 	}
 	return nil
 }
@@ -72,20 +57,9 @@ func (f *config) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &v); err != nil {
 		return fmt.Errorf("unmarshal flag json: %w", err)
 	}
-	_scope := scope.Scope(-1)
-	for i := scope.Other; i < scope.UpperBound; i++ {
-		if i.String() == v.Scope {
-			_scope = i
-		}
-	}
-	if _scope == -1 {
-		_scope = scope.Other
-	}
 	*f = config{
-		Wip:   v.Wip.M,
-		Logs:  v.Logs,
-		Scope: _scope.String(),
-		scope: _scope,
+		Wip:  v.Wip.M,
+		Logs: v.Logs,
 	}
 	return nil
 }
@@ -95,12 +69,4 @@ func (m Mode) File(path string) string {
 		return path + ".flags.yaml"
 	}
 	return path + ".flags.json"
-}
-
-func availableScopes() []string {
-	scopt := make([]string, scope.UpperBound)
-	for i := scope.Other; i < scope.UpperBound; i++ {
-		scopt[i] = i.String()
-	}
-	return scopt
 }

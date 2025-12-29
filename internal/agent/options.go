@@ -136,6 +136,7 @@ func WithGitLog(hash string) Option {
 			ac.logs = append(ac.logs, string(comb))
 			return ac, nil
 		},
+		description: fmt.Sprintf("git log %q", hash),
 	}
 }
 
@@ -148,5 +149,6 @@ func WithNote(note string, kind wip.Context) Option {
 			ac.wip[kind] = append(ac.wip[kind], note)
 			return ac, nil
 		},
+		description: "wip note",
 	}
 }

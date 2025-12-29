@@ -417,10 +417,6 @@ func newCommandClaudeCommit() *cobra.Command {
 						opts = append(opts, agent.WithNote(note, section))
 					}
 				}
-				if v.FlagScope() != scope.Other {
-					opts = append(opts, agent.WithScope(v.FlagScope()))
-					finalScope = v.FlagScope()
-				}
 			}
 
 			debug.Debug("final scope setting", zap.String("scope", finalScope.String()))
