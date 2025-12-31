@@ -140,6 +140,22 @@ func WithGitLog(hash string) Option {
 	}
 }
 
+// WithJujutsuLog configure the agent to take in consideration a [jj show] output
+// [id] can be either a commit id prefix or a change id prefix.
+func WithJujutsuLog(id string) Option {
+	return &option{
+		apply: func(ac AgentContext) (AgentContext, error) {
+			o, err := exec.Command("jj", "show", id).CombinedOutput()
+			if err != nil {
+				return ac, fmt.Errorf("exec: %w", err)
+			}
+			ac.logs = append(ac.logs, string(o))
+			return ac, nil
+		},
+		description: fmt.Sprintf("jj show %q", id),
+	}
+}
+
 func WithNote(note string, kind wip.Context) Option {
 	return &option{
 		apply: func(ac AgentContext) (AgentContext, error) {

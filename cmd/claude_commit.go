@@ -391,7 +391,11 @@ func newCommandClaudeCommit() *cobra.Command {
 			// parse flags from command flags
 
 			for _, hash := range *logs {
-				opts = append(opts, agent.WithGitLog(hash))
+				if *jj {
+					opts = append(opts, agent.WithJujutsuLog(hash))
+				} else {
+					opts = append(opts, agent.WithGitLog(hash))
+				}
 			}
 			for i := wip.Other; i < wip.UpperBound; i++ {
 				for _, note := range *wipt[i] {
