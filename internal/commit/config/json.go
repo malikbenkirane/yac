@@ -3,8 +3,8 @@ package config
 import (
 	"encoding/json"
 
-	"github.com/malikbenkirane/yac/internal/commit/scope"
-	"github.com/malikbenkirane/yac/internal/commit/wip"
+	"github.com/4sp1/yac/internal/commit/scope"
+	"github.com/4sp1/yac/internal/commit/wip"
 )
 
 func NewJson(s scope.Scope) ConfigJSON {

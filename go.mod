@@ -1,4 +1,4 @@
-module github.com/malikbenkirane/yac
+module github.com/4sp1/yac
 
 go 1.23.4
 

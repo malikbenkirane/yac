@@ -6,7 +6,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/malikbenkirane/yac/internal/commit/wip"
+	"github.com/4sp1/yac/internal/commit/wip"
 )
 
 type Flags interface {

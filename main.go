@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/malikbenkirane/yac/cmd"
+	"github.com/4sp1/yac/cmd"
 	"github.com/spf13/cobra"
 )
 

@@ -3,7 +3,7 @@ package scope
 import (
 	"fmt"
 
-	"github.com/malikbenkirane/yac/internal/snake"
+	"github.com/4sp1/yac/internal/snake"
 )
 
 //go:generate stringer -type=Scope

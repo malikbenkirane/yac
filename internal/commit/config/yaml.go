@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/malikbenkirane/yac/internal/commit/scope"
-	"github.com/malikbenkirane/yac/internal/commit/wip"
+	"github.com/4sp1/yac/internal/commit/scope"
+	"github.com/4sp1/yac/internal/commit/wip"
 
 	"gopkg.in/yaml.v3"
 )

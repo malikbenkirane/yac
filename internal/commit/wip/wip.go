@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/malikbenkirane/yac/internal/snake"
+	"github.com/4sp1/yac/internal/snake"
 	"gopkg.in/yaml.v3"
 )
 

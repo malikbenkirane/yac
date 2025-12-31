@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/malikbenkirane/yac/internal/commit/wip"
+	"github.com/4sp1/yac/internal/commit/wip"
 
 	"go.uber.org/zap"
 )

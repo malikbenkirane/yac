@@ -8,9 +8,9 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/malikbenkirane/yac/internal/commit/scope"
-	"github.com/malikbenkirane/yac/internal/commit/wip"
-	"github.com/malikbenkirane/yac/internal/snake"
+	"github.com/4sp1/yac/internal/commit/scope"
+	"github.com/4sp1/yac/internal/commit/wip"
+	"github.com/4sp1/yac/internal/snake"
 
 	"go.uber.org/zap"
 )
