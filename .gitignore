@@ -36,5 +36,4 @@ go.work.sum
 .prompt
 .prepare.yaml
 .commit-stash
-
-
+{payload,response}.json
