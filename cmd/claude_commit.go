@@ -243,7 +243,7 @@ func newCommandClaudeCommitFlagsNew() *cobra.Command {
 	pathYaml = cmd.Flags().String("config-yaml", config.DefaultYamlFile,
 		"specify json config file")
 
-	for i := scope.Other; i < scope.UpperBound; i++ {
+	for i := range scope.UpperBound {
 		scopt[i] = cmd.Flags().Bool(i.Flag(), false, "set commit scope")
 	}
 
@@ -282,7 +282,7 @@ func newCommandClaudeCommit() *cobra.Command {
 		SilenceUsage: true,
 		Args: func(cmd *cobra.Command, args []string) error {
 			var set bool
-			for i := scope.Other; i < scope.UpperBound; i++ {
+			for i := range scope.UpperBound {
 				if *scopt[i] && set {
 					return fmt.Errorf("commit scope was specified twice")
 				}
@@ -397,12 +397,12 @@ func newCommandClaudeCommit() *cobra.Command {
 					opts = append(opts, agent.WithGitLog(hash))
 				}
 			}
-			for i := wip.Other; i < wip.UpperBound; i++ {
+			for i := range wip.UpperBound {
 				for _, note := range *wipt[i] {
 					opts = append(opts, agent.WithNote(note, i))
 				}
 			}
-			for i := scope.Other; i < scope.UpperBound; i++ {
+			for i := range scope.UpperBound {
 				if *scopt[i] {
 					opts = append(opts, agent.WithScope(i))
 					finalScope = i
@@ -598,7 +598,7 @@ func newCommandClaudeCommit() *cobra.Command {
 	noCommitOpt = cmd.Flags().Bool("no-commit", true,
 		"do not commit (review .commit_stash instead)")
 
-	for i := wip.Other; i < wip.UpperBound; i++ {
+	for i := range wip.UpperBound {
 		wipt[i] = cmd.Flags().StringArray(i.Flag(),
 			[]string{}, fmt.Sprintf("WIP %q Notes", i.Header()))
 	}
@@ -606,7 +606,7 @@ func newCommandClaudeCommit() *cobra.Command {
 	logs = cmd.Flags().StringArray("log",
 		[]string{}, "related commit hash (can be repeated)")
 
-	for i := scope.Other; i < scope.UpperBound; i++ {
+	for i := range scope.UpperBound {
 		scopt[i] = cmd.Flags().Bool(i.Flag(), false, i.Label())
 	}
 
