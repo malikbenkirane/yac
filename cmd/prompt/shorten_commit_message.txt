@@ -1,0 +1,31 @@
+You will be given a commit message proposal that needs to be shortened while
+still following commit message best practices.
+
+Here is the commit message to shorten:
+
+<commit_message>
+{{COMMIT_MESSAGE}}
+</commit_message>
+
+Your task is to write a shorter version of this commit message that follows
+these best practices:
+- Use the imperative mood (e.g., "Add feature" not "Added feature" or "Adds
+	feature")
+- Keep the subject line concise (ideally 50 characters or less, maximum 72
+	characters)
+- Capitalize the first letter of the subject line
+- Do not end the subject line with a period
+- Focus on what the commit does and why, not how
+- Preserve the most important information from the original message
+- If the original has a body, you may condense or remove it if the subject line
+	is sufficient
+
+Before writing your shortened commit message, use the scratchpad to think
+through: 1. What is the core action or change being made? 2. What are the most
+essential details that must be preserved? 3. What can be removed or condensed
+without losing critical information?
+
+<scratchpad> [Your analysis here] </scratchpad>
+
+Write your shortened commit message inside <commit_message> tags. If a body is
+needed, separate it from the subject line with a blank line.
