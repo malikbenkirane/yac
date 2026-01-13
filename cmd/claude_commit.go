@@ -278,7 +278,7 @@ func newCommandClaudeCommit() *cobra.Command {
 	var configPath *string
 	var prepare, noPrepare *bool
 
-	var stdout *bool
+	var stdout *string
 
 	cmd := &cobra.Command{
 		Use:          "commit",
@@ -447,7 +447,9 @@ func newCommandClaudeCommit() *cobra.Command {
 
 			debug.Debug("yag timestamp")
 			ts := tstampFormat{litt: false}
-			ts.update()
+			if err := ts.update(); err != nil {
+				return fmt.Errorf("ts.update: %w", err)
+			}
 
 			// debugPrompt
 			if err := func(save bool) error {
@@ -524,9 +526,7 @@ func newCommandClaudeCommit() *cobra.Command {
 
 				var out io.Writer
 
-				out = os.Stdout
-
-				if !*stdout {
+				if len(*stdout) == 0 {
 					debug.Debug("create commit-stash")
 					f, err := os.Create(".commit-stash")
 					if err != nil {
@@ -539,6 +539,19 @@ func newCommandClaudeCommit() *cobra.Command {
 					}()
 					out = f
 					debug.Debug(".commit-stash writer is ready")
+				} else if *stdout == "/dev/stdout" {
+					out = os.Stdout
+				} else {
+					f, err := os.OpenFile(*stdout, os.O_CREATE|os.O_APPEND, 0600)
+					if err != nil {
+						return err
+					}
+					defer func() {
+						if err := f.Close(); err != nil {
+							debug.Warn("unable to close output file", zap.Error(err))
+						}
+					}()
+					out = f
 				}
 
 				w := io.MultiWriter(out, &finalCommit)
@@ -554,7 +567,7 @@ func newCommandClaudeCommit() *cobra.Command {
 			}
 
 			defer func() {
-				if !*stdout {
+				if len(*stdout) == 0 {
 					fmt.Fprintln(os.Stderr, "To amend commit, edit .commit-stash and")
 					fmt.Fprintln(os.Stderr, "git commit --amend --file .commit-stash")
 				}
@@ -593,7 +606,11 @@ func newCommandClaudeCommit() *cobra.Command {
 	noPrepare = cmd.Flags().Bool("no-prepare", true, "don't read flags from prepare file")
 	isJsonConfig = cmd.Flags().Bool("json", false, "read config-json instead of config-yaml")
 
-	stdout = cmd.Flags().Bool("stdout", true, "write commit to stdout instead of .commit-stash")
+	stdout = cmd.Flags().String(
+		"stdout",
+		"/dev/stdout",
+		"Path to file where the commit should be written. Defaults to /dev/stdout; if empty, falls back to .commit-stash",
+	)
 
 	debugDev = cmd.Flags().Bool("dev", false,
 		"enable zap dev logger")
