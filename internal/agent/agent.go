@@ -3,6 +3,7 @@ package agent
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/4sp1/yac/internal/commit/wip"
@@ -27,7 +28,7 @@ func New(opts ...Option) (Agent, error) {
 }
 
 type Agent interface {
-	UserPrompt() (string, error)
+	UserPrompt(f Filler) (string, error)
 }
 
 type AgentContext struct {
@@ -43,10 +44,9 @@ type agent struct {
 	context AgentContext
 }
 
-func (a agent) UserPrompt() (string, error) {
-	var b bytes.Buffer
+func DefaultFiller(a agent) Filler {
 	ideal := []idealSection{}
-	for i := wip.Other; i < wip.UpperBound; i++ {
+	for i := range wip.UpperBound {
 		if notes, ok := a.context.wip[i]; ok {
 			if len(notes) == 0 {
 				continue
@@ -57,13 +57,18 @@ func (a agent) UserPrompt() (string, error) {
 			})
 		}
 	}
-	err := templateFiller{
+	return templateFiller{
 		GitLog:         strings.TrimSpace(strings.Join(a.context.logs, "\n\n")),
 		Scope:          a.context.scope,
 		Diff:           a.context.diff,
 		IdealFuture:    ideal,
 		IdealSeparator: DefaultIdealSeparator,
-	}.Fill(&b)
+	}
+}
+
+func (a agent) UserPrompt(f Filler) (string, error) {
+	var b bytes.Buffer
+	err := f.Fill(&b)
 	if err != nil {
 		return "", fmt.Errorf("templateFiller: %w", err)
 	}

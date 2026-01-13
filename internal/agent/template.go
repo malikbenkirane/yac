@@ -8,6 +8,12 @@ import (
 	"text/template"
 )
 
+type Filler interface {
+	Fill(w io.Writer, opts ...fillerOpt) error
+}
+
+var _ Filler = templateFiller{}
+
 //go:embed user.gotmpl
 var templateDoc string
 
@@ -19,6 +25,10 @@ type templateFiller struct {
 	IdealSeparator string
 
 	hasSeparator bool
+}
+
+type shortenCommitMessageFiller struct {
+	GitCommit string
 }
 
 type idealSection struct {
