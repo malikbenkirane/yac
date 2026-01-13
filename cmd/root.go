@@ -168,7 +168,7 @@ func NewLegacyCLI() *cobra.Command {
 			isEven := false
 			sort.Strings(untracked)
 			for _, cut := range untracked {
-				root, cd, err := gitRoot()
+				root, cd, err := vcsRoot()
 				if err != nil {
 					return err
 				}
@@ -374,7 +374,7 @@ func NewLegacyCLI() *cobra.Command {
 		Use:   "root",
 		Short: "git root command",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			root, cd, err := gitRoot()
+			root, cd, err := vcsRoot()
 			if err != nil {
 				return err
 			}
@@ -460,7 +460,7 @@ func stat() ([]fstat, error) {
 	return status, nil
 }
 
-var gitRoot = func() (gitroot, cd string, err error) {
+var vcsRoot = func() (gitroot, cd string, err error) {
 	cd, err = os.Getwd()
 	if err != nil {
 		return
@@ -468,8 +468,10 @@ var gitRoot = func() (gitroot, cd string, err error) {
 	gitroot = cd
 	{
 		for {
-			_, err = os.Stat(filepath.Join(gitroot, ".git"))
-			if os.IsNotExist(err) {
+			_, errGit := os.Stat(filepath.Join(gitroot, ".git"))
+			_, errJJ := os.Stat(filepath.Join(gitroot, ".jj"))
+			found := errJJ == nil || errGit == nil
+			if !found {
 				gitroot = filepath.Join(gitroot, "..")
 				continue
 			}
@@ -479,7 +481,7 @@ var gitRoot = func() (gitroot, cd string, err error) {
 	return
 }
 
-func timestamp(litt bool) error {
+func timestamp(litt bool) (string, error) {
 	tsfmt := "200601021504.05"
 	if litt {
 		tsfmt = "Mon.Jan.2.34PM"
@@ -490,10 +492,12 @@ func timestamp(litt bool) error {
 		err         error
 	)
 
-	gitroot, cd, err = gitRoot()
+	gitroot, cd, err = vcsRoot()
 	if err != nil {
-		return fmt.Errorf("gitroot: %w", err)
+		return "", fmt.Errorf("vcs root: %w", err)
 	}
+
+	var tag string
 	{
 		var part1, part2 string
 		cdpath := strings.Split(cd, string(os.PathSeparator))
@@ -512,24 +516,35 @@ func timestamp(litt bool) error {
 			}
 			part2 = strings.Join(cdpath[len(cdpath)-l:], ".")
 		}
-		tag := fmt.Sprintf("%s.dev-%s.%s", part1, tstr, part2)
+		tag = fmt.Sprintf("%s.dev-%s.%s", part1, tstr, part2)
 
 		// Remove extra dot character
 		if tag[len(tag)-1] == '.' {
 			tag = tag[:len(tag)-1]
 		}
-
-		fmt.Println(tag)
 	}
+	return tag, nil
+}
+
+type tstampFormat struct {
+	litt bool
+	tag  string
+}
+
+func (tsf *tstampFormat) update() error {
+	tag, err := timestamp(tsf.litt)
+	if err != nil {
+		return err
+	}
+	tsf.tag = strings.TrimSpace(tag)
 	return nil
 }
 
-type tstampFormat struct{ litt bool }
-
 func (tsf tstampFormat) print() error {
-	if err := timestamp(tsf.litt); err != nil {
+	if err := tsf.update(); err != nil {
 		return err
 	}
+	fmt.Println(tsf.tag)
 	return nil
 }
 

@@ -55,7 +55,9 @@ func (vc *vertexClient) preparePrompt(agent agent.Agent) error {
 }
 
 func (vc *vertexClient) post(agent agent.Agent) error {
-	var url = fmt.Sprintf("https://aiplatform.googleapis.com/v1/projects/%[3]s/locations/%[2]s/publishers/anthropic/models/%[1]s:streamRawPredict", vc.model, vc.location, vc.projectId)
+	var url = fmt.Sprintf(
+		"https://aiplatform.googleapis.com/v1/projects/%[3]s/locations/%[2]s/publishers/anthropic/models/%[1]s:streamRawPredict",
+		vc.model, vc.location, vc.projectId)
 
 	var err error
 	defer func() {
@@ -276,6 +278,8 @@ func newCommandClaudeCommit() *cobra.Command {
 	var configPath *string
 	var prepare, noPrepare *bool
 
+	var stdout *bool
+
 	cmd := &cobra.Command{
 		Use:          "commit",
 		Short:        "ask claude for a good commit message (vertexai)",
@@ -441,15 +445,9 @@ func newCommandClaudeCommit() *cobra.Command {
 				}
 			}
 
-			var commitTag string
-			{
-				debug.Debug("yag timestamp")
-				ts, err := exec.Command("yag", "timestamp").CombinedOutput()
-				if err != nil {
-					return err
-				}
-				commitTag = string(ts)
-			}
+			debug.Debug("yag timestamp")
+			ts := tstampFormat{litt: false}
+			ts.update()
 
 			// debugPrompt
 			if err := func(save bool) error {
@@ -471,11 +469,10 @@ func newCommandClaudeCommit() *cobra.Command {
 					debug.Warn(".prompt already exist and is not a folder, will not save user prompt!")
 					return nil
 				}
-				commitTag = strings.TrimSpace(commitTag)
 
 				// backup user prompt
 				{
-					path := path.Join(".prompt", fmt.Sprintf("%s.md", commitTag))
+					path := path.Join(".prompt", fmt.Sprintf("%s.md", ts.tag))
 					f, err := os.Create(path)
 					if err != nil {
 						return fmt.Errorf("os create %q: %w", path, err)
@@ -498,7 +495,7 @@ func newCommandClaudeCommit() *cobra.Command {
 
 				// backup user configured flags via jsonFlagsPath option
 				if hasConfig {
-					path := path.Join(".prompt", configMode.File(commitTag))
+					path := path.Join(".prompt", configMode.File(ts.tag))
 					f, err := os.Create(path)
 					if err != nil {
 						return fmt.Errorf("os create %q: %w", path, err)
@@ -525,22 +522,27 @@ func newCommandClaudeCommit() *cobra.Command {
 			if !*noPost {
 				var commitMsgBody string
 
-				debug.Debug("create commit-stash")
-				f, err := os.Create(".commit-stash")
-				if err != nil {
-					return err
+				var out io.Writer
+
+				out = os.Stdout
+
+				if !*stdout {
+					debug.Debug("create commit-stash")
+					f, err := os.Create(".commit-stash")
+					if err != nil {
+						return err
+					}
+					defer func() {
+						if err = f.Close(); err != nil {
+							debug.Error("unable to close .commit-stash", zap.Error(err))
+						}
+					}()
+					out = f
+					debug.Debug(".commit-stash writer is ready")
 				}
 
-				debug.Debug(".commit-stash opened")
-				defer func() {
-					err = f.Close()
-					if err != nil {
-						debug.Error("unable to close .commit-stash", zap.Error(err))
-					}
-				}()
-
-				w := io.MultiWriter(f, &finalCommit)
-				if _, err = fmt.Fprintln(w, commitTag); err != nil {
+				w := io.MultiWriter(out, &finalCommit)
+				if _, err = fmt.Fprintln(w, ts.tag); err != nil {
 					return fmt.Errorf("write finalCommit: %w", err)
 				}
 
@@ -548,8 +550,15 @@ func newCommandClaudeCommit() *cobra.Command {
 					return fmt.Errorf("write commitMsgBody: %w", err)
 				}
 
-				debug.Debug("write final commit", zap.String("body", commitMsgBody), zap.String("tag", commitTag))
+				debug.Debug("write final commit", zap.String("body", commitMsgBody), zap.String("tag", ts.tag))
 			}
+
+			defer func() {
+				if !*stdout {
+					fmt.Fprintln(os.Stderr, "To amend commit, edit .commit-stash and")
+					fmt.Fprintln(os.Stderr, "git commit --amend --file .commit-stash")
+				}
+			}()
 
 			if *noCommitOpt {
 				red("\n\nnothing to commit\n")
@@ -561,8 +570,6 @@ func newCommandClaudeCommit() *cobra.Command {
 				if err = xc.Run(); err != nil {
 					return fmt.Errorf("unable to pbcopy: %w", err)
 				}
-				fmt.Println("To commit your changes, edit .commit-stash and")
-				fmt.Println("git commit --file .commit-stash")
 				return nil
 			}
 
@@ -574,8 +581,6 @@ func newCommandClaudeCommit() *cobra.Command {
 				if err = cmd.Run(); err != nil {
 					return err
 				}
-				fmt.Println("To amend commit, edit .commit-stash and")
-				fmt.Println("git commit --amend --file .commit-stash")
 				return nil
 			}
 
@@ -587,6 +592,8 @@ func newCommandClaudeCommit() *cobra.Command {
 	prepare = cmd.Flags().Bool("prepare", false, "prepare flags file and exit")
 	noPrepare = cmd.Flags().Bool("no-prepare", true, "don't read flags from prepare file")
 	isJsonConfig = cmd.Flags().Bool("json", false, "read config-json instead of config-yaml")
+
+	stdout = cmd.Flags().Bool("stdout", true, "write commit to stdout instead of .commit-stash")
 
 	debugDev = cmd.Flags().Bool("dev", false,
 		"enable zap dev logger")
@@ -603,7 +610,7 @@ func newCommandClaudeCommit() *cobra.Command {
 			[]string{}, fmt.Sprintf("WIP %q Notes", i.Header()))
 	}
 
-	logs = cmd.Flags().StringArray("log",
+	logs = cmd.Flags().StringSlice("log",
 		[]string{}, "related commit hash (can be repeated)")
 
 	for i := range scope.UpperBound {
