@@ -1,0 +1,29 @@
+You will be converting a draft into a well-formatted GitHub issue for an
+enhancement proposition. Here is the draft:
+
+<draft>
+{{DRAFT}}
+</draft>
+
+Your task is to create a GitHub issue that is concise and quick to read
+(less than a minute). The issue should be structured as follows:
+
+1. **TL;DR**: Start with a one-liner summary at the very top that
+captures the essence of the enhancement request.
+
+2. **Current Behavior**: Briefly describe how things work currently,
+based on the information in the draft.
+
+3. **Wanted Behavior**: Briefly describe the desired enhancement or
+improvement, based on the information in the draft.
+
+Keep the following guidelines in mind:
+- Be concise and clear - the entire issue should be readable in under a
+	minute
+- Use simple, direct language
+- Focus on the key points from the draft without unnecessary details
+- This is an enhancement proposition, so frame it constructively
+- Use appropriate formatting (like bold headers or bullet points) to
+	improve readability
+
+Write your GitHub issue inside <github_issue> tags.
