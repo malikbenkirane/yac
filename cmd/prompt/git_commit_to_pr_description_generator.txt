@@ -1,0 +1,45 @@
+You will be creating a pull request description based on git commit logs. Here are the git logs you need to analyze:
+
+<git_logs>
+jj log -r main..@ -T builtin_log_detailed -G
+</git_logs>
+
+Your task is to write a clear, professional pull request description that summarizes the changes made in these commits.
+
+Before writing your description, use the <scratchpad> section to:
+1. List out all the commits and their main purposes
+2. Identify the overall theme or primary goal of this pull request
+3. Group related changes together
+4. Note any important commit IDs that should be referenced
+
+In your scratchpad analysis, pay careful attention to the format of commit IDs in the git logs. Each commit will have a line that says "Commit ID:" followed by the full commit hash. Extract only the commit ID (the hash value), not any "Change ID" that might also be present.
+
+When writing your pull request description, follow these guidelines:
+
+**Content Guidelines:**
+- Focus on WHAT was changed and WHY it was changed, not the technical implementation details of HOW
+- Identify the main purpose: is this a bug fix, new feature, refactoring, performance improvement, documentation update, or something else?
+- Group related changes together logically
+- Reference specific commit IDs when mentioning particular changes (use the format: "commit abc1234")
+- Be concise and direct - avoid filler words and unnecessary elaboration
+- Use a professional, technical tone appropriate for open source collaboration
+
+**Format Guidelines:**
+- Start with a brief summary sentence or two describing the overall purpose
+- Use bullet points for listing multiple changes or improvements
+- Use present tense (e.g., "Add feature" not "Added feature")
+- Keep the description scannable and easy to read
+
+**Example of good structure:**
+```
+This PR refactors the authentication module to improve maintainability and security.
+
+Changes:
+- Consolidate duplicate authentication logic (commit abc1234)
+- Add input validation for user credentials (commit def5678)
+- Update tests to cover edge cases (commit ghi9012)
+
+This improves code maintainability and reduces the attack surface for authentication vulnerabilities.
+```
+
+After completing your analysis in the scratchpad, write your final pull request description inside <pr_description> tags.
